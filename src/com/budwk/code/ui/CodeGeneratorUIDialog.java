@@ -1,5 +1,7 @@
 package com.budwk.code.ui;
 
+import com.intellij.openapi.ui.Messages;
+
 import javax.swing.*;
 import java.awt.event.*;
 
@@ -12,12 +14,14 @@ public class CodeGeneratorUIDialog extends JDialog {
     private JTextField tf_baseUri;
     private JTextField tf_webPath;
     private JTextField tf_servicePath;
-    private JTextField tf_commonPath;
     private JTextField tf_modelPath;
     private JCheckBox swaggerCheckBox;
     private JCheckBox replaceCheckBox;
+    private DialogCallBack dialogCallBack;
 
-    public CodeGeneratorUIDialog() {
+    public CodeGeneratorUIDialog(String fileName, DialogCallBack dialogCallBack) {
+        this.dialogCallBack = dialogCallBack;
+        setTitle("Cenerate Model: " + fileName);
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -51,12 +55,38 @@ public class CodeGeneratorUIDialog extends JDialog {
     }
 
     private void onOK() {
-        // add your code here
+        if ("".equals(tf_basePackage.getText().trim())) {
+            Messages.showErrorDialog("Base Package cannot be empty", "Error");
+            return;
+        }
+        if ("".equals(tf_modelPath.getText().trim())) {
+            Messages.showErrorDialog("Model Path cannot be empty", "Error");
+            return;
+        }
+        if ("".equals(tf_servicePath.getText().trim())) {
+            Messages.showErrorDialog("Service Path cannot be empty", "Error");
+            return;
+        }
+        if ("".equals(tf_webPath.getText().trim())) {
+            Messages.showErrorDialog("Web Path cannot be empty", "Error");
+            return;
+        }
+        if ("".equals(tf_baseUri.getText().trim())) {
+            Messages.showErrorDialog("Base URI cannot be empty", "Error");
+            return;
+        }
+        dialogCallBack.ok(tf_author.getText().trim(), tf_basePackage.getText().trim(),
+                tf_modelPath.getText().trim(),
+                tf_servicePath.getText().trim(), tf_webPath.getText().trim(), tf_baseUri.getText().trim(), swaggerCheckBox.isSelected(), replaceCheckBox.isSelected());
         dispose();
     }
 
     private void onCancel() {
-        // add your code here if necessary
         dispose();
+    }
+
+    public interface DialogCallBack {
+        void ok(String author, String basePackage, String modelPath, String servicePath,
+                String webPath, String baseUri, boolean swagger, boolean replace);
     }
 }

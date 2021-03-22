@@ -1,6 +1,6 @@
 <idea-plugin>
   <id>com.budwk.code</id>
-  <name>Codegenerator</name>
+  <name>WkCodegenerator</name>
   <version>1.0</version>
   <vendor email="wizzer@qq.com" url="https://budwk.com">BudWk</vendor>
 
@@ -22,7 +22,7 @@
   <actions>
     <!-- Add your actions here -->
     <action id="BudWk.V6" class="com.budwk.code.CodeGeneratorAction" text="WkCodeGenerator" description="BudWk代码生成器">
-      <add-to-group group-id="GenerateGroup" anchor="first"/>
+      <add-to-group group-id="GenerateGroup" anchor="last"/>
       <keyboard-shortcut keymap="$default" first-keystroke="alt T"/>
     </action>
   </actions>
