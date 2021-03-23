@@ -52,8 +52,8 @@ public class CodeGeneratorAction extends AnAction {
         String modelName = basePackage.substring(basePackage.lastIndexOf(".") + 1);
         // article
         String subName = fileName.toLowerCase(Locale.ROOT);
-        if (subName.contains("-")) {
-            subName = subName.substring(subName.indexOf("-") + 1).replaceAll("-", "");
+        if (subName.contains("_")) {
+            subName = subName.substring(subName.indexOf("_") + 1).replaceAll("_", "");
         }
         // cms.article
         String permission = modelName + "." + subName;
@@ -70,11 +70,11 @@ public class CodeGeneratorAction extends AnAction {
         try {
             // service 接口类生成
             content = readTemplateFile("service.txt");
-            content = dealTemplateContent(content, fileName, author, urlPath, modelName, basePackage, rootPackage, humpName, varName);
+            content = dealTemplateContent(content, fileName, author, urlPath, modelName, basePackage, rootPackage, humpName, varName, permission);
             writeToFile(content, getPath(modelPath, basePackage + ".services"), humpName + "Service.java", replace);
             // service 实现类生成
             content = readTemplateFile("service.impl.txt");
-            content = dealTemplateContent(content, fileName, author, urlPath, modelName, basePackage, rootPackage, humpName, varName);
+            content = dealTemplateContent(content, fileName, author, urlPath, modelName, basePackage, rootPackage, humpName, varName, permission);
             writeToFile(content, getPath(servicePath, basePackage + ".services.impl"), humpName + "ServiceImpl.java", replace);
             // controller 控制类生成
             if (swagger) {
@@ -82,7 +82,7 @@ public class CodeGeneratorAction extends AnAction {
             } else {
                 content = readTemplateFile("controller.txt");
             }
-            content = dealTemplateContent(content, fileName, author, urlPath, modelName, basePackage, rootPackage, humpName, varName);
+            content = dealTemplateContent(content, fileName, author, urlPath, modelName, basePackage, rootPackage, humpName, varName, permission);
             writeToFile(content, getPath(webPath, rootPackage + ".web.controllers.platform." + modelName), humpName + "Controller.java", replace);
         } catch (Exception e) {
             Messages.showErrorDialog(project, e.getMessage(), "Error");
@@ -112,7 +112,7 @@ public class CodeGeneratorAction extends AnAction {
     }
 
     private String dealTemplateContent(String content, String fileName, String author, String urlPath, String modelName, String basePackage,
-                                       String rootPackage, String humpName, String varName) {
+                                       String rootPackage, String humpName, String varName, String permission) {
         content = content.replace("${fileName}", fileName);
         content = content.replace("${author}", getAuthor(author));
         content = content.replace("${urlPath}", urlPath);
@@ -121,6 +121,7 @@ public class CodeGeneratorAction extends AnAction {
         content = content.replace("${rootPackage}", rootPackage);
         content = content.replace("${humpName}", humpName);
         content = content.replace("${varName}", varName);
+        content = content.replace("${permission}", permission);
         return content;
     }
 
@@ -129,7 +130,7 @@ public class CodeGeneratorAction extends AnAction {
         Class a = this.getClass();
         in = this.getClass().getResourceAsStream("./template/" + fileName);
         String content = "";
-        content = new String(readStream(in),"UTF-8");
+        content = new String(readStream(in), "UTF-8");
         return content;
     }
 
