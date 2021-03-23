@@ -1,0 +1,116 @@
+package ${rootPackage}.web.controllers.platform.${modelName};
+
+import com.alibaba.dubbo.config.annotation.Reference;
+import ${rootPackage}.commons.annotation.SLog;
+import ${rootPackage}.commons.base.Result;
+import ${rootPackage}.commons.utils.PageUtil;
+import ${rootPackage}.commons.utils.StringUtil;
+import ${basePackage}.models.${fileName};
+import ${basePackage}.services.${humpName}Service;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.nutz.dao.Cnd;
+import org.nutz.ioc.loader.annotation.Inject;
+import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Strings;
+import org.nutz.log.Log;
+import org.nutz.log.Logs;
+import org.nutz.mvc.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+${author}
+@IocBean
+@At("/api/{version}${urlPath}")
+@Ok("json")
+@ApiVersion
+public class ${humpName}Controller {
+    private static final Log log = Logs.get();
+    @Inject
+    @Reference
+    private ${humpName}Service ${varName}Service;
+
+    @At("/list")
+    @POST
+    @Ok("json:full")
+    @RequiresPermissions("${permission}")
+    public Result list(@Param("pageNo") int pageNo, @Param("pageSize") int pageSize, @Param("pageOrderName") String pageOrderName, @Param("pageOrderBy") String pageOrderBy) {
+        try {
+            Cnd cnd = Cnd.NEW();
+            if (Strings.isNotBlank(pageOrderName) && Strings.isNotBlank(pageOrderBy)) {
+                cnd.orderBy(pageOrderName, PageUtil.getOrder(pageOrderBy));
+            }
+            return Result.success().addData(${varName}Service.listPage(pageNo, pageSize, cnd));
+        } catch (Exception e) {
+            return Result.error();
+        }
+    }
+
+    @At("/create")
+    @Ok("json")
+    @POST
+    @RequiresPermissions("${permission}.create")
+    @SLog(tag = "新增", msg = "ID:${${varName}.id}")
+    public Result create(@Param("..") ${fileName} ${varName}, HttpServletRequest req) {
+        try {
+            ${varName}.setCreatedBy(StringUtil.getPlatformUid());
+            ${varName}Service.insert(${varName});
+            return Result.success();
+        } catch (Exception e) {
+            log.error(e);
+            return Result.error();
+        }
+    }
+
+    @At("/get/{id}")
+    @Ok("json")
+    @GET
+    @RequiresPermissions("${permission}")
+    public Result getData(String id, HttpServletRequest req) {
+        try {
+            ${fileName} ${varName} = ${varName}Service.fetch(id);
+            if (${varName} == null) {
+                return Result.error("system.error.noData");
+            }
+            return Result.success().addData(${varName});
+        } catch (Exception e) {
+            log.error(e);
+            return Result.error();
+        }
+    }
+
+    @At("/update")
+    @Ok("json")
+    @POST
+    @RequiresPermissions("${permission}.update")
+    @SLog(tag = "修改", msg = "ID:${${varName}.id}")
+    public Result update(@Param("..") ${fileName} ${varName}, HttpServletRequest req) {
+        try {
+            ${varName}.setUpdatedBy(StringUtil.getPlatformUid());
+            ${varName}Service.updateIgnoreNull(${varName});
+            return Result.success();
+        } catch (Exception e) {
+            log.error(e);
+            return Result.error();
+        }
+    }
+
+    @At("/delete/{id}")
+    @Ok("json")
+    @DELETE
+    @RequiresPermissions("${permission}.delete")
+    @SLog(tag = "删除")
+    public Result delete(String id, HttpServletRequest req) {
+        try {
+            ${fileName} ${varName} = ${varName}Service.fetch(id);
+            if (${varName} == null) {
+                return Result.error("system.error.noData");
+            }
+            ${varName}Service.delete(id);
+            req.setAttribute("_slog_msg", "ID:"+${varName}.getId());
+            return Result.success();
+        } catch (Exception e) {
+            log.error(e);
+            return Result.error();
+        }
+    }
+
+}

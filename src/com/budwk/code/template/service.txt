@@ -1,0 +1,8 @@
+package ${basePackage}.services;
+
+import ${basePackage}.models.${fileName};
+import ${rootPackage}.commons.base.service.BaseService;
+${author}
+public interface ${humpName}Service extends BaseService<${fileName}> {
+
+}

@@ -1,0 +1,16 @@
+package ${basePackage}.services.impl;
+
+import com.alibaba.dubbo.config.annotation.Service;
+import ${basePackage}.models.${fileName};
+import ${basePackage}.services.${humpName}Service;
+import ${rootPackage}.commons.base.service.BaseServiceImpl;
+import org.nutz.dao.Dao;
+import org.nutz.ioc.loader.annotation.IocBean;
+${author}
+@IocBean(args = {"refer:dao"})
+@Service(interfaceClass=${humpName}Service.class)
+public class ${humpName}ServiceImpl extends BaseServiceImpl<${fileName}> implements ${humpName}Service {
+    public ${humpName}ServiceImpl(Dao dao) {
+        super(dao);
+    }
+}

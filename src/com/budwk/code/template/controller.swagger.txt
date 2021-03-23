@@ -1,0 +1,232 @@
+package ${rootPackage}.web.controllers.platform.${modelName};
+
+import com.alibaba.dubbo.config.annotation.Reference;
+import ${rootPackage}.commons.annotation.SLog;
+import ${rootPackage}.commons.base.Result;
+import ${rootPackage}.commons.utils.PageUtil;
+import ${rootPackage}.commons.utils.StringUtil;
+import ${rootPackage}.starter.swagger.annotation.ApiFormParam;
+import ${rootPackage}.starter.swagger.annotation.ApiFormParams;
+import ${basePackage}.models.${fileName};
+import ${basePackage}.services.${humpName}Service;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.servers.Server;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.nutz.dao.Cnd;
+import org.nutz.ioc.loader.annotation.Inject;
+import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Strings;
+import org.nutz.log.Log;
+import org.nutz.log.Logs;
+import org.nutz.mvc.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+${author}
+@IocBean
+@At("/api/{version}${urlPath}")
+@Ok("json")
+@ApiVersion
+@OpenAPIDefinition(tags = {@Tag(name = "${projectName}_${humpName}")}, servers = @Server(url = "/"))
+public class ${humpName}Controller {
+    private static final Log log = Logs.get();
+    @Inject
+    @Reference
+    private ${humpName}Service ${varName}Service;
+
+
+    @At("/list")
+    @POST
+    @Ok("json:full")
+    @RequiresPermissions("${permission}")
+    @Operation(
+            tags = "${projectName}_${humpName}", summary = "分页查询",
+            security = {
+                    @SecurityRequirement(name = "登陆认证"),
+                    @SecurityRequirement(name = "${permission}")
+            },
+            parameters = {
+                    @Parameter(name = "X-Token", description = "X-Token", in = ParameterIn.HEADER, required = true),
+                    @Parameter(name = "X-Id", description = "X-Id", in = ParameterIn.HEADER, required = true)
+            },
+            requestBody = @RequestBody(content = @Content()),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200", description = "执行成功",
+                            content = @Content(schema = @Schema(implementation = Result.class), mediaType = "application/json"))
+            }
+    )
+    @ApiFormParams(
+            apiFormParams = {
+                    @ApiFormParam(name = "pageNo", example = "1", description = "页码", type = "integer", format = "int32"),
+                    @ApiFormParam(name = "pageSize", example = "10", description = "页大小", type = "integer", format = "int32"),
+                    @ApiFormParam(name = "pageOrderName", example = "createdAt", description = "排序字段"),
+                    @ApiFormParam(name = "pageOrderBy", example = "descending", description = "排序方式")
+            }
+    )
+    public Result list(@Param("pageNo") int pageNo, @Param("pageSize") int pageSize, @Param("pageOrderName") String pageOrderName, @Param("pageOrderBy") String pageOrderBy) {
+        try {
+            Cnd cnd = Cnd.NEW();
+            if (Strings.isNotBlank(pageOrderName) && Strings.isNotBlank(pageOrderBy)) {
+                cnd.orderBy(pageOrderName, PageUtil.getOrder(pageOrderBy));
+            }
+            return Result.success().addData(${varName}Service.listPage(pageNo, pageSize, cnd));
+        } catch (Exception e) {
+            return Result.error();
+        }
+    }
+
+    @At("/create")
+    @Ok("json")
+    @POST
+    @RequiresPermissions("${permission}.create")
+    @SLog(tag = "新增", msg = "ID:${${varName}.id}")
+    @Operation(
+            tags = "${projectName}_${humpName}", summary = "新增",
+            security = {
+                    @SecurityRequirement(name = "登陆认证"),
+                    @SecurityRequirement(name = "${permission}.create")
+            },
+            parameters = {
+                    @Parameter(name = "X-Token", description = "X-Token", in = ParameterIn.HEADER, required = true),
+                    @Parameter(name = "X-Id", description = "X-Id", in = ParameterIn.HEADER, required = true)
+            },
+            requestBody = @RequestBody(content = @Content()),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200", description = "执行成功",
+                            content = @Content(schema = @Schema(implementation = Result.class), mediaType = "application/json"))
+            }
+    )
+    @ApiFormParams(
+            implementation = ${fileName}.class
+    )
+    public Result create(@Param("..") ${fileName} ${varName}, HttpServletRequest req) {
+        try {
+            ${varName}.setCreatedBy(StringUtil.getPlatformUid());
+            ${varName}Service.insert(${varName});
+            return Result.success();
+        } catch (Exception e) {
+            log.error(e);
+            return Result.error();
+        }
+    }
+
+    @At("/get/{id}")
+    @Ok("json")
+    @GET
+    @RequiresPermissions("${permission}")
+    @Operation(
+            tags = "${projectName}_${humpName}", summary = "获取信息",
+            security = {
+                    @SecurityRequirement(name = "登陆认证"),
+                    @SecurityRequirement(name = "${permission}")
+            },
+            parameters = {
+                    @Parameter(name = "id", description = "ID", in = ParameterIn.PATH),
+                    @Parameter(name = "X-Token", description = "X-Token", in = ParameterIn.HEADER, required = true),
+                    @Parameter(name = "X-Id", description = "X-Id", in = ParameterIn.HEADER, required = true)
+            },
+            requestBody = @RequestBody(content = @Content()),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200", description = "执行成功",
+                            content = @Content(schema = @Schema(implementation = Result.class), mediaType = "application/json"))
+            }
+    )
+    public Result getData(String id, HttpServletRequest req) {
+        try {
+            ${fileName} ${varName} = ${varName}Service.fetch(id);
+            if (${varName} == null) {
+                return Result.error("system.error.noData");
+            }
+            return Result.success().addData(${varName});
+        } catch (Exception e) {
+            log.error(e);
+            return Result.error();
+        }
+    }
+
+    @At("/update")
+    @Ok("json")
+    @POST
+    @RequiresPermissions("${permission}.update")
+    @SLog(tag = "修改", msg = "ID:${${varName}.id}")
+    @Operation(
+            tags = "${projectName}_${humpName}", summary = "修改",
+            security = {
+                    @SecurityRequirement(name = "登陆认证"),
+                    @SecurityRequirement(name = "${permission}.update")
+            },
+            parameters = {
+                    @Parameter(name = "X-Token", description = "X-Token", in = ParameterIn.HEADER, required = true),
+                    @Parameter(name = "X-Id", description = "X-Id", in = ParameterIn.HEADER, required = true)
+            },
+            requestBody = @RequestBody(content = @Content()),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200", description = "执行成功",
+                            content = @Content(schema = @Schema(implementation = Result.class), mediaType = "application/json"))
+            }
+    )
+    @ApiFormParams(
+            implementation = ${fileName}.class
+    )
+    public Result update(@Param("..") ${fileName} ${varName}, HttpServletRequest req) {
+        try {
+            ${varName}.setUpdatedBy(StringUtil.getPlatformUid());
+            ${varName}Service.updateIgnoreNull(${varName});
+            return Result.success();
+        } catch (Exception e) {
+            log.error(e);
+            return Result.error();
+        }
+    }
+
+    @At("/delete/{id}")
+    @Ok("json")
+    @DELETE
+    @RequiresPermissions("${permission}.delete")
+    @SLog(tag = "删除")
+    @Operation(
+            tags = "${projectName}_${humpName}", summary = "删除",
+            security = {
+                    @SecurityRequirement(name = "登陆认证"),
+                    @SecurityRequirement(name = "${permission}.delete")
+            },
+            parameters = {
+                    @Parameter(name = "id", description = "ID", in = ParameterIn.PATH),
+                    @Parameter(name = "X-Token", description = "X-Token", in = ParameterIn.HEADER, required = true),
+                    @Parameter(name = "X-Id", description = "X-Id", in = ParameterIn.HEADER, required = true)
+            },
+            requestBody = @RequestBody(content = @Content()),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200", description = "执行成功",
+                            content = @Content(schema = @Schema(implementation = Result.class), mediaType = "application/json"))
+            }
+    )
+    public Result delete(String id, HttpServletRequest req) {
+        try {
+            ${fileName} ${varName} = ${varName}Service.fetch(id);
+            if (${varName} == null) {
+                return Result.error("system.error.noData");
+            }
+            ${varName}Service.delete(id);
+            req.setAttribute("_slog_msg", "ID:"+${varName}.getId());
+            return Result.success();
+        } catch (Exception e) {
+            log.error(e);
+            return Result.error();
+        }
+    }
+
+}
