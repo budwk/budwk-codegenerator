@@ -13,11 +13,9 @@ public class CodeGeneratorUIDialog extends JDialog {
     private JButton buttonCancel;
     private JTextField tf_author;
     private JTextField tf_basePackage;
-    private JTextField tf_baseUri;
-    private JTextField tf_webPath;
-    private JTextField tf_servicePath;
-    private JTextField tf_modelPath;
-    private JCheckBox swaggerCheckBox;
+    private JTextField tf_commonPath;
+    private JTextField tf_serverPath;
+    private JCheckBox oepnapiCheckBox;
     private JCheckBox replaceCheckBox;
     private JTextField tf_projectName;
     private DialogCallBack dialogCallBack;
@@ -28,16 +26,15 @@ public class CodeGeneratorUIDialog extends JDialog {
         this.dialogCallBack = dialogCallBack;
         this.tf_basePackage.setText(basePackage);
         modelName = basePackage.substring(basePackage.lastIndexOf(".") + 1);
-        this.tf_baseUri.setText("/platform/" + modelName);
+        this.projectName = "wk-" + modelName;
         this.tf_projectName.setText(projectName);
         this.setText();
         this.setViews(fileName);
     }
 
     private void setText() {
-        this.tf_modelPath.setText(projectName + "-module");
-        this.tf_servicePath.setText(projectName + "-nb-service-" + modelName);
-        this.tf_webPath.setText(projectName + "-nb-web-admin");
+        this.tf_commonPath.setText(projectName + "-common");
+        this.tf_serverPath.setText(projectName + "-server");
     }
 
     private void setViews(String fileName) {
@@ -103,25 +100,17 @@ public class CodeGeneratorUIDialog extends JDialog {
             Messages.showErrorDialog("Project Name cannot be empty", "Error");
             return;
         }
-        if ("".equals(tf_modelPath.getText().trim())) {
-            Messages.showErrorDialog("Model Path cannot be empty", "Error");
+        if ("".equals(tf_commonPath.getText().trim())) {
+            Messages.showErrorDialog("Common Path cannot be empty", "Error");
             return;
         }
-        if ("".equals(tf_servicePath.getText().trim())) {
-            Messages.showErrorDialog("Service Path cannot be empty", "Error");
-            return;
-        }
-        if ("".equals(tf_webPath.getText().trim())) {
-            Messages.showErrorDialog("Web Path cannot be empty", "Error");
-            return;
-        }
-        if ("".equals(tf_baseUri.getText().trim())) {
-            Messages.showErrorDialog("Base URI cannot be empty", "Error");
+        if ("".equals(tf_serverPath.getText().trim())) {
+            Messages.showErrorDialog("Server Path cannot be empty", "Error");
             return;
         }
         dialogCallBack.ok(tf_author.getText().trim(), tf_projectName.getText().trim(), tf_basePackage.getText().trim(),
-                tf_modelPath.getText().trim(),
-                tf_servicePath.getText().trim(), tf_webPath.getText().trim(), tf_baseUri.getText().trim(), swaggerCheckBox.isSelected(), replaceCheckBox.isSelected());
+                tf_commonPath.getText().trim(),
+                tf_serverPath.getText().trim(), oepnapiCheckBox.isSelected(), replaceCheckBox.isSelected());
         dispose();
     }
 
@@ -130,7 +119,7 @@ public class CodeGeneratorUIDialog extends JDialog {
     }
 
     public interface DialogCallBack {
-        void ok(String author, String projectName, String basePackage, String modelPath, String servicePath,
-                String webPath, String baseUri, boolean swagger, boolean replace);
+        void ok(String author, String projectName, String basePackage, String commonPath, String serverPath,
+                boolean openapi, boolean replace);
     }
 }

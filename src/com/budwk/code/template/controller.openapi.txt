@@ -3,6 +3,8 @@ package ${basePackage}.controllers.admin.${modelName};
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import ${basePackage}.models.${fileName};
 import ${basePackage}.services.SysPostService;
+import ${rootPackage}.starter.common.openapi.annotation.*;
+import ${rootPackage}.starter.common.openapi.enums.ParamIn;
 import ${rootPackage}.starter.common.page.Pagination;
 import ${rootPackage}.starter.common.result.Result;
 import ${rootPackage}.starter.common.result.ResultCode;
@@ -30,6 +32,18 @@ public class ${humpName}Controller {
     @At
     @Ok("json")
     @POST
+    @ApiOperation(name = "分页查询")
+    @ApiFormParams(
+            {
+                    @ApiFormParam(name = "pageNo", example = "1", description = "页码", type = "integer"),
+                    @ApiFormParam(name = "pageSize", example = "10", description = "页大小", type = "integer"),
+                    @ApiFormParam(name = "pageOrderName", example = "createdAt", description = "排序字段"),
+                    @ApiFormParam(name = "pageOrderBy", example = "descending", description = "排序方式")
+            }
+    )
+    @ApiResponses(
+            implementation = Pagination.class
+    )
     @SaCheckPermission("${permission}")
     public Result<?> list(@Param("pageNo") int pageNo, @Param("pageSize") int pageSize, @Param("pageOrderName") String pageOrderName, @Param("pageOrderBy") String pageOrderBy) {
         return Result.data(${varName}Service.listPage(pageNo, pageSize, Cnd.NEW().asc("location")));
@@ -38,6 +52,11 @@ public class ${humpName}Controller {
     @At
     @Ok("json")
     @POST
+    @ApiOperation(name = "新增${fileName}")
+    @ApiFormParams(
+            implementation = ${fileName}.class
+    )
+    @ApiResponses
     @SLog("新增${fileName}:${${varName}.id}")
     @SaCheckPermission("${permission}.create")
     public Result<?> create(@Param("..") ${fileName} ${varName}, HttpServletRequest req) {
@@ -49,6 +68,11 @@ public class ${humpName}Controller {
     @At
     @Ok("json")
     @POST
+    @ApiOperation(name = "修改${fileName}")
+    @ApiFormParams(
+            implementation = ${fileName}.class
+    )
+    @ApiResponses
     @SLog("修改${fileName}:${${varName}.name}")
     @SaCheckPermission("${permission}.update")
     public Result<?> update(@Param("..") ${fileName} ${varName}, HttpServletRequest req) {
@@ -60,6 +84,13 @@ public class ${humpName}Controller {
     @At("/get/{id}")
     @Ok("json")
     @GET
+    @ApiOperation(name = "获取${fileName}")
+    @ApiImplicitParams(
+            {
+                    @ApiImplicitParam(name = "id", in = ParamIn.PATH, required = true, check = true)
+            }
+    )
+    @ApiResponses
     @SaCheckPermission("${permission}")
     public Result<?> getData(String id, HttpServletRequest req) {
         ${fileName} ${varName} = ${varName}Service.fetch(id);
@@ -72,6 +103,13 @@ public class ${humpName}Controller {
     @At("/delete/{id}")
     @Ok("json")
     @DELETE
+    @ApiOperation(name = "删除${fileName}")
+    @ApiImplicitParams(
+            {
+                    @ApiImplicitParam(name = "id", in = ParamIn.PATH, required = true, check = true)
+            }
+    )
+    @ApiResponses
     @SLog("删除${fileName}:")
     @SaCheckPermission("${permission}.delete")
     public Result<?> delete(String id, HttpServletRequest req) {

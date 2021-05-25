@@ -34,19 +34,19 @@ public class CodeGeneratorAction extends AnAction {
         String fileName = file.getName();
         CodeGeneratorUIDialog dialog = new CodeGeneratorUIDialog(fileName, basePackage, new CodeGeneratorUIDialog.DialogCallBack() {
             @Override
-            public void ok(String author, String projectName, String basePackage, String modelPath, String servicePath,
-                           String webPath, String baseUri, boolean swagger, boolean replace) {
-                generator(fileName, projectName, author, basePackage, modelPath, servicePath,
-                        webPath, baseUri, swagger, replace);
+            public void ok(String author, String projectName, String basePackage, String commonPath, String serverPath,
+                           boolean openapi, boolean replace) {
+                generator(fileName, projectName, author, basePackage, commonPath, serverPath,
+                        openapi, replace);
             }
         });
-        dialog.setSize(400, 350);
+        dialog.setSize(400, 300);
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }
 
-    public void generator(String fileName, String projectName, String author, String basePackage, String modelPath, String servicePath,
-                          String webPath, String baseUri, boolean swagger, boolean replace) {
+    public void generator(String fileName, String projectName, String author, String basePackage, String commonPath, String serverPath,
+                           boolean openapi, boolean replace) {
         fileName = fileName.substring(0, fileName.lastIndexOf("."));
         // cms
         String modelName = basePackage.substring(basePackage.lastIndexOf(".") + 1);
@@ -58,7 +58,7 @@ public class CodeGeneratorAction extends AnAction {
         // cms.article
         String permission = modelName + "." + subName;
         // /platform/cms/article
-        String urlPath = baseUri + "/" + subName;
+        String urlPath =  "/" + subName;
         // com.budwk.nb
         String rootPackage = basePackage.substring(0, basePackage.lastIndexOf("."));
         // CmsArticle
@@ -71,19 +71,19 @@ public class CodeGeneratorAction extends AnAction {
             // service 接口类生成
             content = readTemplateFile("service.txt");
             content = dealTemplateContent(content, fileName, author, urlPath, modelName, basePackage, rootPackage, humpName, varName, permission);
-            writeToFile(content, getPath(modelPath, basePackage + ".services"), humpName + "Service.java", replace);
+            writeToFile(content, getPath(projectName,serverPath, basePackage + ".services"), humpName + "Service.java", replace);
             // service 实现类生成
             content = readTemplateFile("service.impl.txt");
             content = dealTemplateContent(content, fileName, author, urlPath, modelName, basePackage, rootPackage, humpName, varName, permission);
-            writeToFile(content, getPath(servicePath, basePackage + ".services.impl"), humpName + "ServiceImpl.java", replace);
+            writeToFile(content, getPath(projectName,serverPath, basePackage + ".services.impl"), humpName + "ServiceImpl.java", replace);
             // controller 控制类生成
-            if (swagger) {
-                content = readTemplateFile("controller.swagger.txt");
+            if (openapi) {
+                content = readTemplateFile("controller.openapi.txt");
             } else {
                 content = readTemplateFile("controller.txt");
             }
             content = dealTemplateContent(content, fileName, author, urlPath, modelName, basePackage, rootPackage, humpName, varName, permission);
-            writeToFile(content, getPath(webPath, rootPackage + ".web.controllers.platform." + modelName), humpName + "Controller.java", replace);
+            writeToFile(content, getPath(projectName,serverPath, basePackage + ".controllers.admin"), humpName + "Controller.java", replace);
         } catch (Exception e) {
             Messages.showErrorDialog(project, e.getMessage(), "Error");
             return;
@@ -149,9 +149,13 @@ public class CodeGeneratorAction extends AnAction {
         return outputStream.toByteArray();
     }
 
-    private String getPath(String modelPath, String basePackage) {
+    private String getPath(String projectName,String modelPath, String basePackage) {
         String packagePath = basePackage.replace(".", "/");
-        String appPath = basePath + "/" + modelPath + "/src/main/java/" + packagePath + "/";
+        String rootPath = basePath;
+        if(!basePath.equals(projectName)){
+            rootPath= basePath+"/"+projectName;
+        }
+        String appPath = rootPath + "/" + modelPath + "/src/main/java/" + packagePath + "/";
         return appPath;
     }
 
