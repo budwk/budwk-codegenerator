@@ -2,7 +2,7 @@ package ${basePackage}.controllers.admin.${modelName};
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import ${basePackage}.models.${fileName};
-import ${basePackage}.services.SysPostService;
+import ${basePackage}.services.${humpName}Service;
 import ${rootPackage}.starter.common.page.Pagination;
 import ${rootPackage}.starter.common.result.Result;
 import ${rootPackage}.starter.common.result.ResultCode;

@@ -59,8 +59,10 @@ public class CodeGeneratorAction extends AnAction {
         String permission = modelName + "." + subName;
         // /platform/cms/article
         String urlPath =  "/" + subName;
-        // com.budwk.nb
-        String rootPackage = basePackage.substring(0, basePackage.lastIndexOf("."));
+        // com.budwk.app
+        String rootPackage = basePackage.substring(0, basePackage.indexOf("."));
+        // com.budwk
+        rootPackage = rootPackage.substring(0, rootPackage.indexOf("."));
         // CmsArticle
         String humpName = Strings.line2Hump(fileName);
         // cmsArticle
