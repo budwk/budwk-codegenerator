@@ -1,4 +1,4 @@
-package ${basePackage}.controllers.admin.${modelName};
+package ${basePackage}.controllers.admin;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import ${basePackage}.models.${fileName};
