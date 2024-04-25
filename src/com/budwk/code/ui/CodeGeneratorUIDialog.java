@@ -26,7 +26,7 @@ public class CodeGeneratorUIDialog extends JDialog {
         this.dialogCallBack = dialogCallBack;
         this.tf_basePackage.setText(basePackage);
         modelName = basePackage.substring(basePackage.lastIndexOf(".") + 1);
-        this.projectName = "wk-" + modelName;
+        this.projectName = modelName;
         this.tf_projectName.setText(projectName);
         this.setText();
         this.setViews(fileName);

@@ -102,7 +102,7 @@ public class ${humpName}Controller {
 
     @At("/delete/{id}")
     @Ok("json")
-    @DELETE
+    @POST
     @ApiOperation(name = "删除${fileName}")
     @ApiImplicitParams(
             {

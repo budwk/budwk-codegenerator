@@ -154,9 +154,9 @@ public class CodeGeneratorAction extends AnAction {
     private String getPath(String projectName,String modelPath, String basePackage) {
         String packagePath = basePackage.replace(".", "/");
         String rootPath = basePath;
-        if(!basePath.equals(projectName)){
-            rootPath= basePath+"/"+projectName;
-        }
+        //if(!basePath.equals(projectName)){
+        //    rootPath= basePath+"/"+projectName;
+        //}
         String appPath = rootPath + "/" + modelPath + "/src/main/java/" + packagePath + "/";
         return appPath;
     }
