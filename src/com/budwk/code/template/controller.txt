@@ -3,7 +3,7 @@ package ${basePackage}.controllers.admin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import ${basePackage}.models.${fileName};
 import ${basePackage}.services.${humpName}Service;
-import ${rootPackage}.starter.common.page.Pagination;
+import com.osdiot.starter.common.openapi.annotation.ApiDefinition;
 import ${rootPackage}.starter.common.result.Result;
 import ${rootPackage}.starter.common.result.ResultCode;
 import ${rootPackage}.starter.log.annotation.SLog;
