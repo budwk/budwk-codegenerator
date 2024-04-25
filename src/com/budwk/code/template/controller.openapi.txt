@@ -11,7 +11,6 @@ import ${rootPackage}.starter.common.result.ResultCode;
 import ${rootPackage}.starter.log.annotation.SLog;
 import ${rootPackage}.starter.security.utils.SecurityUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.nutz.dao.Chain;
 import org.nutz.dao.Cnd;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
@@ -61,6 +60,7 @@ public class ${humpName}Controller {
     @SaCheckPermission("${permission}.create")
     public Result<?> create(@Param("..") ${fileName} ${varName}, HttpServletRequest req) {
         ${varName}.setCreatedBy(SecurityUtil.getUserId());
+        ${varName}.setUpdatedBy(SecurityUtil.getUserId());
         ${varName}Service.insert(${varName});
         return Result.success();
     }
@@ -100,25 +100,21 @@ public class ${humpName}Controller {
         return Result.data(${varName});
     }
 
-    @At("/delete/{id}")
+    @At("/delete")
     @Ok("json")
     @POST
     @ApiOperation(name = "删除${fileName}")
-    @ApiImplicitParams(
+    @ApiFormParams(
             {
-                    @ApiImplicitParam(name = "id", in = ParamIn.PATH, required = true, check = true)
+                    @ApiFormParam(name = "id", required = true, check = true),
+                    @ApiFormParam(name = "name")
             }
     )
     @ApiResponses
-    @SLog("删除${fileName}:")
+    @SLog("删除${fileName}:${name}")
     @SaCheckPermission("${permission}.delete")
-    public Result<?> delete(String id, HttpServletRequest req) {
-        ${fileName} ${varName} = ${varName}Service.fetch(id);
-        if (${varName} == null) {
-            return Result.error(ResultCode.NULL_DATA_ERROR);
-        }
+    public Result<?> delete(@Param("id") String id, @Param("name") String name, HttpServletRequest req) {
         ${varName}Service.delete(id);
-        req.setAttribute("_slog_msg", ${varName}.getId());
         return Result.success();
     }
 }
