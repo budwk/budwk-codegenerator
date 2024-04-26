@@ -35,9 +35,9 @@ public class CodeGeneratorAction extends AnAction {
         CodeGeneratorUIDialog dialog = new CodeGeneratorUIDialog(fileName, basePackage, new CodeGeneratorUIDialog.DialogCallBack() {
             @Override
             public void ok(String author, String projectName, String basePackage, String commonPath, String serverPath,
-                           boolean openapi, boolean replace) {
+                           boolean openapi, boolean replace, String modelName) {
                 generator(fileName, projectName, author, basePackage, commonPath, serverPath,
-                        openapi, replace);
+                        openapi, replace, modelName);
             }
         });
         dialog.setSize(400, 300);
@@ -46,19 +46,21 @@ public class CodeGeneratorAction extends AnAction {
     }
 
     public void generator(String fileName, String projectName, String author, String basePackage, String commonPath, String serverPath,
-                           boolean openapi, boolean replace) {
+                           boolean openapi, boolean replace,String modelTitle) {
         fileName = fileName.substring(0, fileName.lastIndexOf("."));
         // cms
         String modelName = basePackage.substring(basePackage.lastIndexOf(".") + 1);
         // article
         String subName = fileName.toLowerCase(Locale.ROOT);
+        String subPath = fileName.toLowerCase(Locale.ROOT);
         if (subName.contains("_")) {
-            subName = subName.substring(subName.indexOf("_") + 1).replaceAll("_", "");
+            subName = subName.substring(subName.indexOf("_") + 1).replaceAll("_", ".");
+            subPath = subPath.substring(subPath.indexOf("_") + 1).replaceAll("_", "/");
         }
         // cms.article
         String permission = modelName + "." + subName;
         // /platform/cms/article
-        String urlPath =  "/" + subName;
+        String urlPath =  "/" + subPath;
         // com.budwk.app
         String rootPackage = basePackage.substring(0, basePackage.lastIndexOf("."));
         // com.budwk
@@ -72,11 +74,11 @@ public class CodeGeneratorAction extends AnAction {
         try {
             // service 接口类生成
             content = readTemplateFile("service.txt");
-            content = dealTemplateContent(content, fileName, author, urlPath, modelName, basePackage, rootPackage, humpName, varName, permission);
+            content = dealTemplateContent(content, fileName, author, urlPath, modelName, basePackage, rootPackage, humpName, varName, permission, modelTitle);
             writeToFile(content, getPath(projectName,serverPath, basePackage + ".services"), humpName + "Service.java", replace);
             // service 实现类生成
             content = readTemplateFile("service.impl.txt");
-            content = dealTemplateContent(content, fileName, author, urlPath, modelName, basePackage, rootPackage, humpName, varName, permission);
+            content = dealTemplateContent(content, fileName, author, urlPath, modelName, basePackage, rootPackage, humpName, varName, permission, modelTitle);
             writeToFile(content, getPath(projectName,serverPath, basePackage + ".services.impl"), humpName + "ServiceImpl.java", replace);
             // controller 控制类生成
             if (openapi) {
@@ -84,7 +86,7 @@ public class CodeGeneratorAction extends AnAction {
             } else {
                 content = readTemplateFile("controller.txt");
             }
-            content = dealTemplateContent(content, fileName, author, urlPath, modelName, basePackage, rootPackage, humpName, varName, permission);
+            content = dealTemplateContent(content, fileName, author, urlPath, modelName, basePackage, rootPackage, humpName, varName, permission, modelTitle);
             writeToFile(content, getPath(projectName,serverPath, basePackage + ".controllers.admin"), humpName + "Controller.java", replace);
         } catch (Exception e) {
             Messages.showErrorDialog(project, e.getMessage(), "Error");
@@ -114,7 +116,7 @@ public class CodeGeneratorAction extends AnAction {
     }
 
     private String dealTemplateContent(String content, String fileName, String author, String urlPath, String modelName, String basePackage,
-                                       String rootPackage, String humpName, String varName, String permission) {
+                                       String rootPackage, String humpName, String varName, String permission,String modelTitle) {
         content = content.replace("${fileName}", fileName);
         content = content.replace("${author}", getAuthor(author));
         content = content.replace("${urlPath}", urlPath);
@@ -124,6 +126,7 @@ public class CodeGeneratorAction extends AnAction {
         content = content.replace("${humpName}", humpName);
         content = content.replace("${varName}", varName);
         content = content.replace("${permission}", permission);
+        content = content.replace("${modelTitle}", modelTitle);
         return content;
     }
 

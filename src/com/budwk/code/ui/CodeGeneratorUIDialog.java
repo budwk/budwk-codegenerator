@@ -12,6 +12,7 @@ public class CodeGeneratorUIDialog extends JDialog {
     private JButton buttonOK;
     private JButton buttonCancel;
     private JTextField tf_author;
+    private JTextField tf_modelName;
     private JTextField tf_basePackage;
     private JTextField tf_commonPath;
     private JTextField tf_serverPath;
@@ -28,6 +29,7 @@ public class CodeGeneratorUIDialog extends JDialog {
         modelName = basePackage.substring(basePackage.lastIndexOf(".") + 1);
         this.projectName = modelName;
         this.tf_projectName.setText(projectName);
+        this.tf_modelName.setText(projectName);
         this.setText();
         this.setViews(fileName);
     }
@@ -110,7 +112,7 @@ public class CodeGeneratorUIDialog extends JDialog {
         }
         dialogCallBack.ok(tf_author.getText().trim(), tf_projectName.getText().trim(), tf_basePackage.getText().trim(),
                 tf_commonPath.getText().trim(),
-                tf_serverPath.getText().trim(), oepnapiCheckBox.isSelected(), replaceCheckBox.isSelected());
+                tf_serverPath.getText().trim(), oepnapiCheckBox.isSelected(), replaceCheckBox.isSelected(), tf_modelName.getText().trim());
         dispose();
     }
 
@@ -120,6 +122,6 @@ public class CodeGeneratorUIDialog extends JDialog {
 
     public interface DialogCallBack {
         void ok(String author, String projectName, String basePackage, String commonPath, String serverPath,
-                boolean openapi, boolean replace);
+                boolean openapi, boolean replace,String modelName);
     }
 }

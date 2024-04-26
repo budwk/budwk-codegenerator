@@ -5,6 +5,7 @@ import ${basePackage}.models.${fileName};
 import ${basePackage}.services.${humpName}Service;
 import ${rootPackage}.starter.common.openapi.annotation.*;
 import ${rootPackage}.starter.common.openapi.enums.ParamIn;
+import ${rootPackage}.starter.common.page.PageUtil;
 import ${rootPackage}.starter.common.page.Pagination;
 import ${rootPackage}.starter.common.result.Result;
 import ${rootPackage}.starter.common.result.ResultCode;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.nutz.dao.Cnd;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Strings;
 import org.nutz.mvc.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,8 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 ${author}
 @IocBean
 @At("/admin${urlPath}")
-@SLog(tag = "${fileName}")
-@ApiDefinition(tag = "${fileName}")
+@SLog(tag = "${modelTitle}")
+@ApiDefinition(tag = "${modelTitle}")
 @Slf4j
 public class ${humpName}Controller {
     @Inject
@@ -45,18 +47,24 @@ public class ${humpName}Controller {
     )
     @SaCheckPermission("${permission}")
     public Result<?> list(@Param("pageNo") int pageNo, @Param("pageSize") int pageSize, @Param("pageOrderName") String pageOrderName, @Param("pageOrderBy") String pageOrderBy) {
-        return Result.data(${varName}Service.listPage(pageNo, pageSize, Cnd.NEW().asc("location")));
+        Cnd cnd = Cnd.NEW();
+        if (Strings.isNotBlank(pageOrderName) && Strings.isNotBlank(pageOrderBy)) {
+            cnd.orderBy(pageOrderName, PageUtil.getOrder(pageOrderBy));
+        } else {
+            cnd.desc("createdAt");
+        }
+        return Result.data(${varName}Service.listPage(pageNo, pageSize, cnd));
     }
 
     @At
     @Ok("json")
     @POST
-    @ApiOperation(name = "新增${fileName}")
+    @ApiOperation(name = "新增${modelTitle}")
     @ApiFormParams(
             implementation = ${fileName}.class
     )
     @ApiResponses
-    @SLog("新增${fileName}:${${varName}.id}")
+    @SLog("新增${modelTitle}:${${varName}.name}")
     @SaCheckPermission("${permission}.create")
     public Result<?> create(@Param("..") ${fileName} ${varName}, HttpServletRequest req) {
         ${varName}.setCreatedBy(SecurityUtil.getUserId());
@@ -68,12 +76,12 @@ public class ${humpName}Controller {
     @At
     @Ok("json")
     @POST
-    @ApiOperation(name = "修改${fileName}")
+    @ApiOperation(name = "修改${modelTitle}")
     @ApiFormParams(
             implementation = ${fileName}.class
     )
     @ApiResponses
-    @SLog("修改${fileName}:${${varName}.name}")
+    @SLog("修改${modelTitle}:${${varName}.name}")
     @SaCheckPermission("${permission}.update")
     public Result<?> update(@Param("..") ${fileName} ${varName}, HttpServletRequest req) {
         ${varName}.setUpdatedBy(SecurityUtil.getUserId());
@@ -84,7 +92,7 @@ public class ${humpName}Controller {
     @At("/get/{id}")
     @Ok("json")
     @GET
-    @ApiOperation(name = "获取${fileName}")
+    @ApiOperation(name = "获取${modelTitle}")
     @ApiImplicitParams(
             {
                     @ApiImplicitParam(name = "id", in = ParamIn.PATH, required = true, check = true)
@@ -103,7 +111,7 @@ public class ${humpName}Controller {
     @At("/delete")
     @Ok("json")
     @POST
-    @ApiOperation(name = "删除${fileName}")
+    @ApiOperation(name = "删除${modelTitle}")
     @ApiFormParams(
             {
                     @ApiFormParam(name = "id", required = true, check = true),
@@ -111,7 +119,7 @@ public class ${humpName}Controller {
             }
     )
     @ApiResponses
-    @SLog("删除${fileName}:${name}")
+    @SLog("删除${modelTitle}:${name}")
     @SaCheckPermission("${permission}.delete")
     public Result<?> delete(@Param("id") String id, @Param("name") String name, HttpServletRequest req) {
         ${varName}Service.delete(id);

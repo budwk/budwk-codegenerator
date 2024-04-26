@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>com.budwk.code</id>
   <name>WkCodegenerator</name>
-  <version>8.0</version>
+  <version>8.1</version>
   <vendor email="wizzer@qq.com" url="https://budwk.com">BudWk</vendor>
 
   <description>BudWk MVC Java Code Generator IDEA Plugin</description>
